@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --radius: 0.5rem
+  }
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #383838 #181818;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #181818;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #383838;
+  border-radius: 3px;
+}
+
+body {
+  background-color: #121212;
+  color: #ffffff;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+select option {
+  background-color: #282828;
+  color: #ffffff;
+}
+
