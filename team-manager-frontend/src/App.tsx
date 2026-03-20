@@ -3,6 +3,9 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import SuperviseurDashboardPage from './pages/SuperviseurDashboardPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import OperateurDashboardPage from './pages/OperateurDashboardPage';
 import TeamPage from './pages/TeamPage';
 import CalendarPage from './pages/CalendarPage';
 import HolidaysPage from './pages/HolidaysPage';
@@ -24,6 +27,17 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+// Role-based dashboard redirect
+function DashboardRouter() {
+  const { user, isAdmin, isSuperviseur, isOperateur } = useAuth();
+  
+  if (isAdmin) return <AdminDashboardPage />;
+  if (isSuperviseur) return <SuperviseurDashboardPage />;
+  if (isOperateur) return <OperateurDashboardPage />;
+  
+  return <DashboardPage />;
+}
+
 function AppRoutes() {
   const { user, loading } = useAuth();
 
@@ -39,7 +53,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-        <Route index element={<DashboardPage />} />
+        <Route index element={<DashboardRouter />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="holidays" element={<HolidaysPage />} />

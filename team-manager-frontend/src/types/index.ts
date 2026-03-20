@@ -1,8 +1,11 @@
 export interface User {
-  id: number;
+  id: string;
   name: string;
   email: string;
-  role: string;
+  role: 'admin' | 'superviseur' | 'operateur';
+  teamId?: string;
+  superviseurId?: string;
+  totalSalary: number;
   created_at: string;
 }
 
@@ -10,6 +13,45 @@ export interface AuthResponse {
   access_token: string;
   token_type: string;
   user: User;
+}
+
+export interface Team {
+  _id: string;
+  name: string;
+  superviseurId: string;
+  superviseurId_data?: User;
+  members: User[];
+  created_at: string;
+}
+
+export interface Event {
+  _id: string;
+  title: string;
+  type: 'holiday' | 'astreinte';
+  date: string;
+  assignedOperators: string[];
+  assignedOperators_data?: User[];
+  amount: number;
+  isMoroccoHoliday: boolean;
+  holidayName?: string;
+  created_at: string;
+}
+
+export interface Confirmation {
+  _id: string;
+  eventId: string | Event;
+  eventId_data?: Event;
+  submittedBy: string | User;
+  submittedBy_data?: User;
+  status: 'pending' | 'approved' | 'rejected';
+  processedBy?: string | User;
+  processedBy_data?: User;
+  rejectionReason?: string;
+  selectedOperators: string[] | User[];
+  selectedOperators_data?: User[];
+  paidOperators: string[];
+  superviseurPaid: boolean;
+  created_at: string;
 }
 
 export interface TeamMember {

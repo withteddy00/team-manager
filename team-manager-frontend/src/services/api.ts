@@ -32,12 +32,43 @@ export default api;
 export const authAPI = {
   login: (email: string, password: string) =>
     api.post('/api/auth/login', { email, password }),
-  register: (name: string, email: string, password: string, role: string = 'admin') =>
-    api.post('/api/auth/register', { name, email, password, role }),
+  register: (name: string, email: string, password: string, role: string = 'operateur', superviseurId?: string, teamId?: string) =>
+    api.post('/api/auth/register', { name, email, password, role, superviseurId, teamId }),
   me: () => api.get('/api/auth/me'),
 };
 
-// Team
+// Team Management (new - superviseur manages team)
+export const teamManagementAPI = {
+  createTeam: (name: string) => api.post('/api/team-management/', { name }),
+  getMyTeam: () => api.get('/api/team-management/my-team'),
+  getTeamById: (id: string) => api.get(`/api/team-management/${id}`),
+  addOperator: (operatorId: string) => api.post('/api/team-management/add-operator', { operatorId }),
+  removeOperator: (operatorId: string) => api.delete(`/api/team-management/remove-operator/${operatorId}`),
+  getAllTeams: () => api.get('/api/team-management/all'),
+  getAvailableOperators: () => api.get('/api/team-management/available-operators'),
+};
+
+// Events
+export const eventsAPI = {
+  getAll: (params?: { type?: string; year?: number; month?: number }) =>
+    api.get('/api/events/', { params }),
+  getMyEvents: () => api.get('/api/events/my-events'),
+  syncHolidays: (year: number) => api.post('/api/events/sync-holidays', { year }),
+  createAstreinte: (date: string) => api.post('/api/events/astreinte', { date }),
+  assignOperators: (eventId: string, operatorIds: string[]) => 
+    api.post('/api/events/astreinte/assign', { eventId, operatorIds }),
+  submitHolidayConfirmation: (eventId: string) => 
+    api.post('/api/events/holiday/confirm', { eventId }),
+  getConfirmations: (params?: { status?: string; type?: string }) =>
+    api.get('/api/events/confirmations', { params }),
+  getMyConfirmations: () => api.get('/api/events/confirmations/my'),
+  approveConfirmation: (confirmationId: string) => 
+    api.put(`/api/events/confirmations/${confirmationId}/approve`),
+  rejectConfirmation: (confirmationId: string, reason?: string) => 
+    api.put(`/api/events/confirmations/${confirmationId}/reject`, { reason }),
+};
+
+// Team (old - for backward compatibility)
 export const teamAPI = {
   list: (search?: string, status?: string) =>
     api.get('/api/team/', { params: { search, status } }),

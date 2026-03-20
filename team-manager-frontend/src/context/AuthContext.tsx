@@ -6,9 +6,11 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role?: string) => Promise<void>;
+  register: (name: string, email: string, password: string, role?: string, superviseurId?: string, teamId?: string) => Promise<void>;
   logout: () => void;
   isAdmin: boolean;
+  isSuperviseur: boolean;
+  isOperateur: boolean;
   loading: boolean;
 }
 
@@ -37,8 +39,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(res.data.user);
   };
 
-  const register = async (name: string, email: string, password: string, role: string = 'admin') => {
-    const res = await authAPI.register(name, email, password, role);
+  const register = async (name: string, email: string, password: string, role: string = 'operateur', superviseurId?: string, teamId?: string) => {
+    const res = await authAPI.register(name, email, password, role, superviseurId, teamId);
     localStorage.setItem('token', res.data.access_token);
     setToken(res.data.access_token);
     setUser(res.data.user);
@@ -51,7 +53,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, register, logout, isAdmin: user?.role === 'admin', loading }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      token, 
+      login, 
+      register, 
+      logout, 
+      isAdmin: user?.role === 'admin',
+      isSuperviseur: user?.role === 'superviseur',
+      isOperateur: user?.role === 'operateur',
+      loading 
+    }}>
       {children}
     </AuthContext.Provider>
   );

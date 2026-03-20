@@ -9,7 +9,7 @@ export default function LoginPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('admin');
+  const [role, setRole] = useState('operateur');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -101,7 +101,8 @@ export default function LoginPage() {
                   className="w-full bg-[#282828] border border-[#383838] rounded-lg px-4 py-3 text-white focus:outline-none focus:border-[#1DB954] transition-colors"
                 >
                   <option value="admin">Administrateur</option>
-                  <option value="viewer">Lecteur</option>
+                  <option value="superviseur">Superviseur</option>
+                  <option value="operateur">Opérateur</option>
                 </select>
               </div>
             )}
