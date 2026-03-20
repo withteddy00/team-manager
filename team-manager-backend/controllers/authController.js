@@ -7,6 +7,25 @@ const generateToken = (id) => {
   });
 };
 
+// GET SUPERVISEURS - Get all superviseurs (for admin to create teams)
+export const getSuperviseurs = async (req, res) => {
+  try {
+    // Only admin can get superviseurs
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Only admin can access this' });
+    }
+
+    const superviseurs = await User.find({ role: 'superviseur' })
+      .select('name email teamId')
+      .populate('teamId', 'name');
+
+    res.json(superviseurs);
+  } catch (error) {
+    console.error('Get superviseurs error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // POST /api/auth/register
 export const register = async (req, res) => {
   try {

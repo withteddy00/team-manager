@@ -25,6 +25,12 @@ const userSchema = new mongoose.Schema({
     enum: ['admin', 'superviseur', 'operateur'],
     default: 'operateur'
   },
+  // Validation status for operateurs (pending/approved/rejected)
+  validationStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'approved' // Default to approved for existing users
+  },
   // For superviseur - reference to team they manage
   teamId: {
     type: mongoose.Schema.Types.ObjectId,

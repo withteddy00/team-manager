@@ -6,6 +6,7 @@ export interface User {
   teamId?: string;
   superviseurId?: string;
   totalSalary: number;
+  validationStatus?: 'pending' | 'approved' | 'rejected';
   created_at: string;
 }
 
@@ -18,9 +19,12 @@ export interface AuthResponse {
 export interface Team {
   _id: string;
   name: string;
-  superviseurId: string;
+  superviseurId: string | User;
   superviseurId_data?: User;
-  members: User[];
+  operateurs: (string | User)[];
+  operateurs_data?: User[];
+  pendingOperateurs: (string | User)[];
+  pendingOperateurs_data?: User[];
   created_at: string;
 }
 

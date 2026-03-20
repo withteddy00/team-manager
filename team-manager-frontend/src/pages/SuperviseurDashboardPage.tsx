@@ -12,6 +12,8 @@ export default function SuperviseurDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedAstreinte, setSelectedAstreinte] = useState<string | null>(null);
   const [selectedOperators, setSelectedOperators] = useState<string[]>([]);
+  const [showAddOperator, setShowAddOperator] = useState(false);
+  const [newOperator, setNewOperator] = useState({ name: '', email: '', password: '' });
 
   useEffect(() => {
     loadData();
@@ -61,6 +63,30 @@ export default function SuperviseurDashboardPage() {
     }
   };
 
+  const handleAddOperator = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await teamManagementAPI.addOperator(newOperator.name, newOperator.email, newOperator.password);
+      setShowAddOperator(false);
+      setNewOperator({ name: '', email: '', password: '' });
+      loadData();
+      alert('Opérateur ajouté! En attente de validation par admin.');
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Erreur lors de l\'ajout');
+    }
+  };
+
+  const handleRemoveOperator = async (operatorId: string) => {
+    if (!confirm('Voulez-vous vraiment retirer cet opérateur?')) return;
+    try {
+      await teamManagementAPI.removeOperator(operatorId);
+      loadData();
+      alert('Opérateur retiré!');
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Erreur lors du retrait');
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -98,25 +124,96 @@ export default function SuperviseurDashboardPage() {
         </div>
       </div>
 
-      {/* Team Members */}
+      {/* Team Members - use operateurs instead of members */}
       {team && (
         <div className="bg-[#1E1E1E] p-6 rounded-lg">
-          <h2 className="text-xl font-semibold text-white mb-4">Mon Équipe</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-white">Mon Équipe</h2>
+            <button
+              onClick={() => setShowAddOperator(true)}
+              className="px-3 py-1 bg-[#1DB954] text-white rounded-lg hover:bg-[#1ed760] text-sm"
+            >
+              + Ajouter opérateur
+            </button>
+          </div>
+
+          {/* Add Operator Form */}
+          {showAddOperator && (
+            <form onSubmit={handleAddOperator} className="mb-4 p-4 bg-[#2A2A2A] rounded-lg">
+              <h3 className="text-white font-medium mb-3">Nouvel Opérateur</h3>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Nom"
+                  value={newOperator.name}
+                  onChange={(e) => setNewOperator({ ...newOperator, name: e.target.value })}
+                  className="flex-1 bg-[#282828] border border-[#383838] rounded-lg px-3 py-2 text-white text-sm"
+                  required
+                />
+                <input
+                  type="email"
+                  placeholder="Email"
+                  value={newOperator.email}
+                  onChange={(e) => setNewOperator({ ...newOperator, email: e.target.value })}
+                  className="flex-1 bg-[#282828] border border-[#383838] rounded-lg px-3 py-2 text-white text-sm"
+                  required
+                />
+                <input
+                  type="password"
+                  placeholder="Mot de passe"
+                  value={newOperator.password}
+                  onChange={(e) => setNewOperator({ ...newOperator, password: e.target.value })}
+                  className="flex-1 bg-[#282828] border border-[#383838] rounded-lg px-3 py-2 text-white text-sm"
+                  required
+                />
+                <button type="submit" className="px-3 py-2 bg-[#1DB954] text-white rounded-lg text-sm">
+                  Ajouter
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddOperator(false)}
+                  className="px-3 py-2 bg-gray-700 text-white rounded-lg text-sm"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          )}
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="text-left text-gray-400 border-b border-gray-700">
                   <th className="pb-3">Nom</th>
                   <th className="pb-3">Email</th>
+                  <th className="pb-3">Statut</th>
                   <th className="pb-3">Salaire Total</th>
+                  <th className="pb-3">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {team.members?.map((member: any) => (
+                {(team.operateurs_data || team.operateurs || []).map((member: any) => (
                   <tr key={member._id} className="border-b border-gray-800">
                     <td className="py-3 text-white">{member.name}</td>
                     <td className="py-3 text-gray-400">{member.email}</td>
+                    <td className="py-3">
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        member.validationStatus === 'approved' 
+                          ? 'bg-green-900 text-green-300' 
+                          : 'bg-yellow-900 text-yellow-300'
+                      }`}>
+                        {member.validationStatus === 'approved' ? 'Actif' : 'En attente'}
+                      </span>
+                    </td>
                     <td className="py-3 text-[#1DB954]">{member.totalSalary || 0} MAD</td>
+                    <td className="py-3">
+                      <button
+                        onClick={() => handleRemoveOperator(member._id)}
+                        className="text-red-400 hover:text-red-300 text-sm"
+                      >
+                        Retirer
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>

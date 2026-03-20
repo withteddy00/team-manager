@@ -11,7 +11,13 @@ const teamSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  members: [{
+  // Active operateurs (approved by admin)
+  operateurs: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
+  // Operateurs pending approval
+  pendingOperateurs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   }],
@@ -22,6 +28,9 @@ const teamSchema = new mongoose.Schema({
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
 });
+
+// Index for faster queries
+teamSchema.index({ superviseurId: 1 });
 
 const Team = mongoose.model('Team', teamSchema);
 export default Team;

@@ -35,17 +35,28 @@ export const authAPI = {
   register: (name: string, email: string, password: string, role: string = 'operateur', superviseurId?: string, teamId?: string) =>
     api.post('/api/auth/register', { name, email, password, role, superviseurId, teamId }),
   me: () => api.get('/api/auth/me'),
+  getSuperviseurs: () => api.get('/api/auth/superviseurs'),
 };
 
 // Team Management (new - superviseur manages team)
 export const teamManagementAPI = {
-  createTeam: (name: string) => api.post('/api/team-management/', { name }),
-  getMyTeam: () => api.get('/api/team-management/my-team'),
-  getTeamById: (id: string) => api.get(`/api/team-management/${id}`),
-  addOperator: (operatorId: string) => api.post('/api/team-management/add-operator', { operatorId }),
-  removeOperator: (operatorId: string) => api.delete(`/api/team-management/remove-operator/${operatorId}`),
+  // Admin routes
+  createTeam: (name: string, superviseurId: string) => 
+    api.post('/api/team-management/', { name, superviseurId }),
   getAllTeams: () => api.get('/api/team-management/all'),
+  validateOperateur: (teamId: string, operateurId: string, action: 'approve' | 'reject') =>
+    api.put(`/api/team-management/${teamId}/validate/${operateurId}`, { action }),
+  deleteTeam: (teamId: string) => api.delete(`/api/team-management/${teamId}`),
+  
+  // Superviseur routes
+  getMyTeam: () => api.get('/api/team-management/my-team'),
+  getPendingOperateurs: () => api.get('/api/team-management/my-team/pending'),
+  addOperator: (name: string, email: string, password: string) => 
+    api.post('/api/team-management/add-operator', { name, email, password }),
+  removeOperator: (operatorId: string) => 
+    api.delete(`/api/team-management/remove-operator/${operatorId}`),
   getAvailableOperators: () => api.get('/api/team-management/available-operators'),
+  getTeamById: (id: string) => api.get(`/api/team-management/${id}`),
 };
 
 // Events
