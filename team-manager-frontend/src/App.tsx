@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import SuperviseurDashboardPage from './pages/SuperviseurDashboardPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import AdminUsersPage from './pages/AdminUsersPage';
 import OperateurDashboardPage from './pages/OperateurDashboardPage';
 import TeamPage from './pages/TeamPage';
 import CalendarPage from './pages/CalendarPage';
@@ -54,6 +55,7 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/" /> : <LoginPage />} />
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route index element={<DashboardRouter />} />
+        <Route path="users" element={isAdmin ? <AdminUsersPage /> : <Navigate to="/" />} />
         <Route path="team" element={<TeamPage />} />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="holidays" element={<HolidaysPage />} />

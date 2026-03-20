@@ -32,9 +32,16 @@ export default api;
 export const authAPI = {
   login: (email: string, password: string) =>
     api.post('/api/auth/login', { email, password }),
-  register: (name: string, email: string, password: string, role: string = 'operateur', superviseurId?: string, teamId?: string) =>
-    api.post('/api/auth/register', { name, email, password, role, superviseurId, teamId }),
   me: () => api.get('/api/auth/me'),
+  
+  // Admin user management
+  getAllUsers: () => api.get('/api/auth/users'),
+  getPendingOperateurs: () => api.get('/api/auth/users/pending'),
+  createUser: (name: string, email: string, password: string, role: string) =>
+    api.post('/api/auth/users', { name, email, password, role }),
+  validateOperateur: (userId: string, action: 'approve' | 'reject') =>
+    api.put(`/api/auth/users/${userId}/validate`, { action }),
+  deleteUser: (userId: string) => api.delete(`/api/auth/users/${userId}`),
   getSuperviseurs: () => api.get('/api/auth/superviseurs'),
 };
 

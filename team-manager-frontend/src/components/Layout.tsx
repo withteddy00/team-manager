@@ -3,28 +3,34 @@ import { Link, useLocation, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { notificationsAPI } from '../services/api';
 import {
-  LayoutDashboard, Users, Calendar, Sun, Pyramid, History, Download, Settings, LogOut, Bell, Menu
+  LayoutDashboard, Users, Calendar, Sun, Pyramid, History, Download, Settings, LogOut, Bell, Menu, UserCog
 } from 'lucide-react';
 
 const navItems = [
-  { path: '/', label: 'Tableau de bord', icon: LayoutDashboard },
-  { path: '/team', label: 'Équipe', icon: Users },
-  { path: '/calendar', label: 'Calendrier', icon: Calendar },
-  { path: '/holidays', label: 'Jours Fériés', icon: Sun },
-  { path: '/egypt-duty', label: 'Astreinte Égypte', icon: Pyramid },
-  { path: '/history', label: 'Historique', icon: History },
-  { path: '/exports', label: 'Exports', icon: Download },
-  { path: '/settings', label: 'Paramètres', icon: Settings },
+  { path: '/', label: 'Tableau de bord', icon: LayoutDashboard, roles: ['admin', 'superviseur', 'operateur'] },
+  { path: '/users', label: 'Utilisateurs', icon: UserCog, roles: ['admin'] },
+  { path: '/team', label: 'Équipe', icon: Users, roles: ['admin', 'superviseur', 'operateur'] },
+  { path: '/calendar', label: 'Calendrier', icon: Calendar, roles: ['admin', 'superviseur', 'operateur'] },
+  { path: '/holidays', label: 'Jours Fériés', icon: Sun, roles: ['admin', 'superviseur'] },
+  { path: '/egypt-duty', label: 'Astreinte Égypte', icon: Pyramid, roles: ['admin', 'superviseur'] },
+  { path: '/history', label: 'Historique', icon: History, roles: ['admin', 'superviseur', 'operateur'] },
+  { path: '/exports', label: 'Exports', icon: Download, roles: ['admin'] },
+  { path: '/settings', label: 'Paramètres', icon: Settings, roles: ['admin', 'superviseur', 'operateur'] },
 ];
 
 export default function Layout() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isSuperviseur } = useAuth();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showNotifs, setShowNotifs] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+
+  // Filter nav items by role
+  const filteredNavItems = navItems.filter(item => 
+    item.roles.includes(user?.role || '')
+  );
 
   useEffect(() => {
     loadNotifications();
@@ -75,7 +81,7 @@ export default function Layout() {
         </div>
 
         <nav className="flex-1 py-4 overflow-y-auto">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
             return (
@@ -171,7 +177,10 @@ export default function Layout() {
               </div>
               <div className="hidden sm:block">
                 <p className="text-sm font-medium">{user?.name}</p>
-                <p className="text-xs text-[#b3b3b3]">{user?.role === 'admin' ? 'Administrateur' : 'Lecteur'}</p>
+                <p className="text-xs text-[#b3b3b3]">
+                  {user?.role === 'admin' ? 'Administrateur' : 
+                   user?.role === 'superviseur' ? 'Superviseur' : 'Opérateur'}
+                </p>
               </div>
             </div>
           </div>
