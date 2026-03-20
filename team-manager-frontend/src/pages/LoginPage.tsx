@@ -14,10 +14,13 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    console.log('[LoginPage] Submitting login for:', email);
     try {
       await login(email, password);
+      console.log('[LoginPage] Login successful, navigating to /');
       navigate('/');
     } catch (err: any) {
+      console.error('[LoginPage] Login failed:', err.response?.data || err.message);
       setError(err.response?.data?.message || 'Erreur de connexion');
     } finally {
       setLoading(false);
