@@ -112,7 +112,7 @@ export const getMyEvents = async (req, res) => {
     // Add info about whether user is assigned
     const eventsWithAssignment = events.map(event => {
       const isAssigned = event.assignedOperators.includes(superviseurId) || 
-        team.members.some(m => event.assignedOperators.includes(m));
+        team.operateurs.some(op => event.assignedOperators.includes(op));
       return {
         ...event.toObject(),
         isAssigned
@@ -200,7 +200,7 @@ export const assignOperatorsToAstreinte = async (req, res) => {
     }
 
     for (const opId of operatorIds) {
-      if (!team.members.includes(opId)) {
+      if (!team.operateurs.some(op => op.toString() === opId)) {
         return res.status(400).json({ message: 'Operator not in your team' });
       }
     }
@@ -245,12 +245,12 @@ export const submitHolidayConfirmation = async (req, res) => {
       return res.status(404).json({ message: 'Team not found' });
     }
 
-    // Create confirmation with all team members + superviseur
+    // Create confirmation with all team operators + superviseur
     const confirmation = await Confirmation.create({
       eventId: event._id,
       submittedBy: superviseurId,
       status: 'pending',
-      selectedOperators: team.members,
+      selectedOperators: team.operateurs,
       superviseurPaid: false
     });
 
