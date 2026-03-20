@@ -1,9 +1,15 @@
 import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   type: {
     type: String,
-    required: true
+    enum: ['holiday', 'astreinte', 'confirmation', 'rejection', 'general'],
+    default: 'general'
   },
   title: {
     type: String,
@@ -13,8 +19,14 @@ const notificationSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  event_date: {
-    type: String,
+  eventId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event',
+    default: null
+  },
+  confirmationId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Confirmation',
     default: null
   },
   is_read: {

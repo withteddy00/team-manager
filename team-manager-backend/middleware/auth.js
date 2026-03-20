@@ -32,3 +32,19 @@ export const admin = (req, res, next) => {
     res.status(403).json({ message: 'Not authorized as admin' });
   }
 };
+
+export const superviseur = (req, res, next) => {
+  if (req.user && (req.user.role === 'superviseur' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as superviseur' });
+  }
+};
+
+export const operateur = (req, res, next) => {
+  if (req.user && (req.user.role === 'operateur' || req.user.role === 'superviseur' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({ message: 'Not authorized as operateur' });
+  }
+};

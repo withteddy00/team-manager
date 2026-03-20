@@ -3,12 +3,14 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
+import teamManagementRoutes from './routes/teamManagementRoutes.js';
 import teamRoutes from './routes/teamRoutes.js';
 import holidaysRoutes from './routes/holidaysRoutes.js';
 import egyptDutyRoutes from './routes/egyptDutyRoutes.js';
 import historyRoutes from './routes/historyRoutes.js';
 import notificationsRoutes from './routes/notificationsRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
 
 dotenv.config();
 
@@ -23,12 +25,14 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/team-management', teamManagementRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/holidays', holidaysRoutes);
 app.use('/api/egypt-duty', egyptDutyRoutes);
 app.use('/api/history', historyRoutes);
 app.use('/api/notifications', notificationsRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/events', eventRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

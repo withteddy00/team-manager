@@ -10,10 +10,16 @@ const generateToken = (id) => {
 // POST /api/auth/register
 export const register = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, superviseurId, teamId } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Please provide all required fields' });
+    }
+
+    // Validate role
+    const validRoles = ['admin', 'superviseur', 'operateur'];
+    if (role && !validRoles.includes(role)) {
+      return res.status(400).json({ message: 'Invalid role' });
     }
 
     const userExists = await User.findOne({ email });
@@ -21,7 +27,14 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = await User.create({ name, email, password, role: role || 'admin' });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password, 
+      role: role || 'operateur',
+      superviseurId,
+      teamId
+    });
 
     res.status(201).json({
       access_token: generateToken(user._id),
@@ -31,6 +44,9 @@ export const register = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        teamId: user.teamId,
+        superviseurId: user.superviseurId,
+        totalSalary: user.totalSalary,
         created_at: user.created_at
       }
     });
@@ -67,6 +83,9 @@ export const login = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        teamId: user.teamId,
+        superviseurId: user.superviseurId,
+        totalSalary: user.totalSalary,
         created_at: user.created_at
       }
     });
@@ -85,6 +104,9 @@ export const getMe = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      teamId: user.teamId,
+      superviseurId: user.superviseurId,
+      totalSalary: user.totalSalary,
       created_at: user.created_at
     });
   } catch (error) {
