@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+// Use proxy in dev, direct URL in production
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -9,6 +10,7 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
+    console.log('[API] Adding Authorization header');
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
@@ -32,22 +34,76 @@ export default api;
 export const authAPI = {
   login: (email: string, password: string) =>
     api.post('/api/auth/login', { email, password }),
-  register: (name: string, email: string, password: string, role: string = 'admin') =>
-    api.post('/api/auth/register', { name, email, password, role }),
   me: () => api.get('/api/auth/me'),
+  
+  // Admin user management
+  getAllUsers: () => api.get('/api/auth/users'),
+  getPendingOperateurs: () => api.get('/api/auth/users/pending'),
+  createUser: (name: string, email: string, password: string, role: string) =>
+    api.post('/api/auth/users', { name, email, password, role }),
+  validateOperateur: (userId: string, action: 'approve' | 'reject') =>
+    api.put(`/api/auth/users/${userId}/validate`, { action }),
+  deleteUser: (userId: string) => api.delete(`/api/auth/users/${userId}`),
+  getSuperviseurs: () => api.get('/api/auth/superviseurs'),
 };
 
-// Team
+// Team Management (new - superviseur manages team)
+export const teamManagementAPI = {
+  // Admin routes
+  createTeam: (name: string, superviseurId: string) => 
+    api.post('/api/team-management/', { name, superviseurId }),
+  getAllTeams: () => api.get('/api/team-management/all'),
+  validateOperateur: (teamId: string, operateurId: string, action: 'approve' | 'reject') =>
+    api.put(`/api/team-management/${teamId}/validate/${operateurId}`, { action }),
+  deleteTeam: (teamId: string) => api.delete(`/api/team-management/${teamId}`),
+  
+  // Superviseur routes
+  getMyTeam: () => api.get('/api/team-management/my-team'),
+  getPendingOperateurs: () => api.get('/api/team-management/my-team/pending'),
+  addOperator: (name: string, email: string, password: string) => 
+    api.post('/api/team-management/add-operator', { name, email, password }),
+  removeOperator: (operatorId: string) => 
+    api.delete(`/api/team-management/remove-operator/${operatorId}`),
+  getAvailableOperators: () => api.get('/api/team-management/available-operators'),
+  getTeamById: (id: string) => api.get(`/api/team-management/${id}`),
+};
+
+// Events
+export const eventsAPI = {
+  getAll: (params?: { type?: string; year?: number; month?: number }) =>
+    api.get('/api/events/', { params }),
+  getMyEvents: () => api.get('/api/events/my-events'),
+  syncHolidays: (year: number) => api.post('/api/events/sync-holidays', { year }),
+  createAstreinte: (date: string) => api.post('/api/events/astreinte', { date }),
+  assignOperators: (eventId: string, operatorIds: string[]) => 
+    api.post('/api/events/astreinte/assign', { eventId, operatorIds }),
+  submitHolidayConfirmation: (eventId: string) => 
+    api.post('/api/events/holiday/confirm', { eventId }),
+  getConfirmations: (params?: { status?: string; type?: string }) =>
+    api.get('/api/events/confirmations', { params }),
+  getMyConfirmations: () => api.get('/api/events/confirmations/my'),
+  approveConfirmation: (confirmationId: string) => 
+    api.put(`/api/events/confirmations/${confirmationId}/approve`),
+  rejectConfirmation: (confirmationId: string, reason?: string) => 
+    api.put(`/api/events/confirmations/${confirmationId}/reject`, { reason }),
+};
+
+// Team (real teams with superviseur and operateurs)
 export const teamAPI = {
-  list: (search?: string, status?: string) =>
-    api.get('/api/team/', { params: { search, status } }),
-  get: (id: number) => api.get(`/api/team/${id}`),
-  create: (data: { full_name: string; position?: string; phone?: string; email?: string; status?: string }) =>
+  list: () => api.get('/api/team/'),
+  get: (id: string) => api.get(`/api/team/${id}`),
+  create: (data: { name: string; superviseurId: string }) =>
     api.post('/api/team/', data),
-  update: (id: number, data: { full_name?: string; position?: string; phone?: string; email?: string; status?: string }) =>
+  update: (id: string, data: { name?: string; superviseurId?: string }) =>
     api.put(`/api/team/${id}`, data),
-  delete: (id: number) => api.delete(`/api/team/${id}`),
-  toggleStatus: (id: number) => api.patch(`/api/team/${id}/toggle-status`),
+  delete: (id: string) => api.delete(`/api/team/${id}`),
+  // Operateur management
+  addOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/add-operateur`, { operateurId }),
+  approveOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/approve-operateur`, { operateurId }),
+  rejectOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/reject-operateur`, { operateurId }),
 };
 
 // Holidays

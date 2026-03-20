@@ -22,8 +22,29 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'user'],
-    default: 'admin'
+    enum: ['admin', 'superviseur', 'operateur'],
+    default: 'operateur'
+  },
+  // Validation status for operateurs (pending/approved/rejected)
+  validationStatus: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'approved' // Default to approved for existing users
+  },
+  // For superviseur - reference to team they manage
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
+  },
+  // For operateur - reference to their superviseur
+  superviseurId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  // Salary tracking
+  totalSalary: {
+    type: Number,
+    default: 0
   }
 }, {
   timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' }
