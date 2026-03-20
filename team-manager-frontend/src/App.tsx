@@ -8,6 +8,7 @@ import AdminDashboardPage from './pages/AdminDashboardPage';
 import AdminUsersPage from './pages/AdminUsersPage';
 import OperateurDashboardPage from './pages/OperateurDashboardPage';
 import TeamPage from './pages/TeamPage';
+import TeamsPage from './pages/TeamsPage';
 import CalendarPage from './pages/CalendarPage';
 import HolidaysPage from './pages/HolidaysPage';
 import EgyptDutyPage from './pages/EgyptDutyPage';
@@ -146,6 +147,14 @@ function AppRoutes() {
         
         {/* All authenticated users */}
         <Route path="team" element={<TeamPage />} />
+        <Route 
+          path="teams" 
+          element={
+            <RoleRoute allowedRoles={['admin', 'superviseur']}>
+              <TeamsPage />
+            </RoleRoute>
+          } 
+        />
         <Route path="calendar" element={<CalendarPage />} />
         <Route path="history" element={<HistoryPage />} />
         <Route path="settings" element={<SettingsPage />} />

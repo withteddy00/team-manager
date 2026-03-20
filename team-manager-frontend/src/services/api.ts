@@ -87,17 +87,22 @@ export const eventsAPI = {
     api.put(`/api/events/confirmations/${confirmationId}/reject`, { reason }),
 };
 
-// Team (old - for backward compatibility)
+// Team (real teams with superviseur and operateurs)
 export const teamAPI = {
-  list: (search?: string, status?: string) =>
-    api.get('/api/team/', { params: { search, status } }),
-  get: (id: number) => api.get(`/api/team/${id}`),
-  create: (data: { full_name: string; position?: string; phone?: string; email?: string; status?: string }) =>
+  list: () => api.get('/api/team/'),
+  get: (id: string) => api.get(`/api/team/${id}`),
+  create: (data: { name: string; superviseurId: string }) =>
     api.post('/api/team/', data),
-  update: (id: number, data: { full_name?: string; position?: string; phone?: string; email?: string; status?: string }) =>
+  update: (id: string, data: { name?: string; superviseurId?: string }) =>
     api.put(`/api/team/${id}`, data),
-  delete: (id: number) => api.delete(`/api/team/${id}`),
-  toggleStatus: (id: number) => api.patch(`/api/team/${id}/toggle-status`),
+  delete: (id: string) => api.delete(`/api/team/${id}`),
+  // Operateur management
+  addOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/add-operateur`, { operateurId }),
+  approveOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/approve-operateur`, { operateurId }),
+  rejectOperateur: (teamId: string, operateurId: string) =>
+    api.patch(`/api/team/${teamId}/reject-operateur`, { operateurId }),
 };
 
 // Holidays

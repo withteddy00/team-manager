@@ -9,7 +9,8 @@ import {
 const navItems = [
   { path: '/', label: 'Tableau de bord', icon: LayoutDashboard, roles: ['admin', 'superviseur', 'operateur'] },
   { path: '/users', label: 'Utilisateurs', icon: UserCog, roles: ['admin'] },
-  { path: '/team', label: 'Équipe', icon: Users, roles: ['admin', 'superviseur', 'operateur'] },
+  { path: '/teams', label: 'Équipes', icon: Users, roles: ['admin', 'superviseur'] },
+  { path: '/team', label: 'Membres', icon: Users, roles: ['admin', 'superviseur', 'operateur'] },
   { path: '/calendar', label: 'Calendrier', icon: Calendar, roles: ['admin', 'superviseur', 'operateur'] },
   { path: '/holidays', label: 'Jours Fériés', icon: Sun, roles: ['admin', 'superviseur'] },
   { path: '/egypt-duty', label: 'Astreinte Égypte', icon: Pyramid, roles: ['admin', 'superviseur'] },
